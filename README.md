@@ -111,6 +111,14 @@ active, what is running now, and whether anything needs approval.
 Each run has a stable ID, a workspace, model, cost, MCP scope, attempt number,
 and a live log. Approval-required actions stop at a visible human checkpoint.
 
+### Creating and managing agents
+
+![Agent Hub agents page demo](docs/screenshots/agents-demo.svg)
+
+The `/agents` page is where you create schedules and manage the operating
+policy for each agent: skill, workspace, cadence, MCP scope, model, retries,
+timeouts, and approval behavior.
+
 ## Operating model
 
 The shortest way to understand Agent Hub is:
