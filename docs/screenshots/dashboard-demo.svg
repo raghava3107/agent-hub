@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Hub dashboard demo</title>
+  <desc id="desc">Synthetic Agent Hub dashboard with sample skills, agents, running jobs, approvals, and activity.</desc>
+  <rect width="1600" height="900" fill="#f8fafc"/>
+  <rect width="230" height="900" fill="#0c2344"/>
+  <text x="34" y="62" fill="#fff" font-family="Arial,sans-serif" font-size="28" font-weight="700">Spidey</text>
+  <circle cx="42" cy="42" r="16" fill="#ef3340"/><text x="33" y="48" fill="#fff" font-family="Arial" font-size="12" font-weight="700">SP</text>
+  <text x="30" y="124" fill="#9fb2ca" font-family="Arial" font-size="12" font-weight="700">WORKSPACE</text>
+  <g fill="#e7eef7" font-family="Arial" font-size="16">
+    <text x="34" y="164">▦  Dashboard</text><text x="34" y="208">▣  Agents</text><text x="34" y="252">▶  Runs</text><text x="34" y="296">✓  Approvals</text>
+  </g>
+  <text x="30" y="356" fill="#9fb2ca" font-family="Arial" font-size="12" font-weight="700">LIBRARY</text>
+  <g fill="#e7eef7" font-family="Arial" font-size="16"><text x="34" y="396">☆  Skills</text><text x="34" y="440">□  Repos</text></g>
+  <text x="30" y="850" fill="#9fb2ca" font-family="Arial" font-size="12">LOCAL · 127.0.0.1:8765</text>
+  <text x="270" y="72" fill="#111827" font-family="Arial" font-size="32" font-weight="700">Dashboard</text>
+  <text x="270" y="105" fill="#64748b" font-family="Arial" font-size="16">Overview of your agents, runs, and approvals</text>
+  <rect x="1280" y="48" width="125" height="42" rx="7" fill="#ef3340"/><text x="1303" y="75" fill="#fff" font-family="Arial" font-size="15" font-weight="700">+ New agent</text>
+  <rect x="270" y="145" width="300" height="135" rx="10" fill="#fff" stroke="#dbe3ed"/><rect x="585" y="145" width="300" height="135" rx="10" fill="#fff" stroke="#dbe3ed"/><rect x="900" y="145" width="300" height="135" rx="10" fill="#fff" stroke="#dbe3ed"/><rect x="1215" y="145" width="300" height="135" rx="10" fill="#fff" stroke="#dbe3ed"/>
+  <g font-family="Arial"><text x="295" y="180" fill="#64748b" font-size="13" font-weight="700">SKILLS</text><text x="295" y="232" fill="#111827" font-size="38" font-weight="700">36</text><text x="295" y="257" fill="#64748b" font-size="13">available to run</text>
+  <text x="610" y="180" fill="#64748b" font-size="13" font-weight="700">AGENTS</text><text x="610" y="232" fill="#111827" font-size="38" font-weight="700">8</text><text x="610" y="257" fill="#64748b" font-size="13">6 active · 2 paused</text>
+  <text x="925" y="180" fill="#64748b" font-size="13" font-weight="700">RUNNING NOW</text><text x="925" y="232" fill="#111827" font-size="38" font-weight="700">2</text><text x="925" y="257" fill="#64748b" font-size="13">14 completed today</text>
+  <text x="1240" y="180" fill="#64748b" font-size="13" font-weight="700">APPROVALS</text><text x="1240" y="232" fill="#111827" font-size="38" font-weight="700">3</text><text x="1240" y="257" fill="#64748b" font-size="13">$12.84 spent today</text></g>
+  <rect x="270" y="310" width="1245" height="95" rx="10" fill="#fff" stroke="#dbe3ed"/><text x="295" y="345" fill="#111827" font-family="Arial" font-size="17" font-weight="700">Upcoming runs</text><text x="295" y="378" fill="#64748b" font-family="Arial" font-size="14">release-watch in 4 min · sync-pr-queue in 11 min · daily-brief at 09:00</text><text x="1260" y="345" fill="#64748b" font-family="Arial" font-size="13">Asia/Kolkata · live</text>
+  <rect x="270" y="435" width="735" height="395" rx="10" fill="#fff" stroke="#dbe3ed"/><rect x="1030" y="435" width="485" height="395" rx="10" fill="#fff" stroke="#dbe3ed"/>
+  <text x="295" y="472" fill="#111827" font-family="Arial" font-size="18" font-weight="700">Top agents</text><text x="925" y="472" fill="#64748b" font-family="Arial" font-size="14">View all →</text>
+  <g font-family="Arial" font-size="13"><text x="295" y="510" fill="#64748b" font-weight="700">AGENT</text><text x="610" y="510" fill="#64748b" font-weight="700">SKILL</text><text x="820" y="510" fill="#64748b" font-weight="700">RUNS</text><text x="900" y="510" fill="#64748b" font-weight="700">SUCCESS</text>
+  <g fill="#d92d3a" font-weight="700"><text x="295" y="552">sync-pr-queue</text><text x="295" y="612">release-watch</text><text x="295" y="672">daily-brief</text><text x="295" y="732">docs-drift-check</text></g>
+  <g fill="#334155"><text x="610" y="552">pr-review</text><text x="610" y="612">pr-watcher</text><text x="610" y="672">daily-digest</text><text x="610" y="732">documentation</text></g>
+  <g fill="#111827"><text x="820" y="552">128</text><text x="820" y="612">64</text><text x="820" y="672">31</text><text x="820" y="732">18</text></g>
+  <g fill="#059669"><text x="900" y="552">98%</text><text x="900" y="612">94%</text><text x="900" y="672">100%</text><text x="900" y="732">96%</text></g></g>
+  <text x="1055" y="472" fill="#111827" font-family="Arial" font-size="18" font-weight="700">Recent activity</text><text x="1420" y="472" fill="#64748b" font-family="Arial" font-size="14">View all →</text>
+  <g font-family="Arial" font-size="14"><circle cx="1060" cy="525" r="5" fill="#10b981"/><text x="1078" y="530" fill="#111827" font-weight="700">sync-pr-queue</text><text x="1078" y="552" fill="#64748b">COMPLETED · run #2045 · $1.42</text><circle cx="1060" cy="600" r="5" fill="#10b981"/><text x="1078" y="605" fill="#111827" font-weight="700">release-watch</text><text x="1078" y="627" fill="#64748b">COMPLETED · run #2044 · $0.88</text><circle cx="1060" cy="675" r="5" fill="#f59e0b"/><text x="1078" y="680" fill="#111827" font-weight="700">docs-drift-check</text><text x="1078" y="702" fill="#64748b">RUNNING · run #2043 · $0.31</text><circle cx="1060" cy="750" r="5" fill="#ef4444"/><text x="1078" y="755" fill="#111827" font-weight="700">customer-signal</text><text x="1078" y="777" fill="#64748b">FAILED · run #2042 · retry 1/2</text></g>
+  <text x="270" y="875" fill="#94a3b8" font-family="Arial" font-size="12">DEMO SCREENSHOT · SYNTHETIC DATA · NO REAL REPOSITORIES OR RUNS</text>
+</svg>

@@ -128,13 +128,12 @@ This is **not** a workaround. It's what runs:
 - Ollama, LM Studio
 - Every background app that survives a reboot
 
-Our plist looks like this (`Label` is `<agent_hub.plist_label_prefix from config/local.json>.hub`
-— `com.rkota.rragents.hub` and the `/Users/rkota/...` paths below are this
-example machine's actual values; `bin/service.sh install` generates yours
+Our plist looks like this (`Label` is `<agent_hub.plist_label_prefix from config/local.json>.hub`;
+the example label and paths below are illustrative). `bin/service.sh install` generates yours
 from `config/local.json` and your real repo path):
 
 ```xml
-<key>Label</key><string>com.rkota.rragents.hub</string>
+<key>Label</key><string>com.yourname.agent-hub.hub</string>
 <key>ProgramArguments</key>
 <array>
   <string>/bin/bash</string>

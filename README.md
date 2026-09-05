@@ -26,18 +26,20 @@ cost, when to consider a server), see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 1. [What it is / what it isn't](#what-it-is--what-it-isnt)
 2. [Quick start](#quick-start)
 3. [Security](#security)
-4. [Architecture: what happens when an agent runs](#architecture-what-happens-when-an-agent-runs)
-5. [UI overview — every page](#ui-overview--every-page)
-6. [Data model — every table + every column](#data-model--every-table--every-column)
-7. [Agent-level settings](#agent-level-settings)
-8. [MCP scoping](#mcp-scoping)
-9. [Approvals + safety model](#approvals--safety-model)
-10. [Skill sync](#skill-sync)
-11. [Files & directory layout](#files--directory-layout)
-12. [Environment variables](#environment-variables)
-13. [Extending — wiring real senders, custom skills](#extending--wiring-real-senders-custom-skills)
-14. [Troubleshooting](#troubleshooting)
-15. [Roadmap](#roadmap)
+4. [Screenshots](#screenshots)
+5. [Operating model](#operating-model)
+6. [Architecture: what happens when an agent runs](#architecture-what-happens-when-an-agent-runs)
+7. [UI overview — every page](#ui-overview--every-page)
+8. [Data model — every table + every column](#data-model--every-table--every-column)
+9. [Agent-level settings](#agent-level-settings)
+10. [MCP scoping](#mcp-scoping)
+11. [Approvals + safety model](#approvals--safety-model)
+12. [Skill sync](#skill-sync)
+13. [Files & directory layout](#files--directory-layout)
+14. [Environment variables](#environment-variables)
+15. [Extending — wiring real senders, custom skills](#extending--wiring-real-senders-custom-skills)
+16. [Troubleshooting](#troubleshooting)
+17. [Roadmap](#roadmap)
 
 ---
 
@@ -89,6 +91,40 @@ Before building a shared or hosted version, add at minimum:
 - an allowlist for executable tools and MCP servers.
 
 See [SECURITY.md](SECURITY.md) for reporting vulnerabilities.
+
+## Screenshots
+
+These are synthetic demo screenshots. Names, counts, costs, repositories, and
+log lines are illustrative; no personal or production data is included.
+
+### Dashboard overview
+
+![Agent Hub dashboard demo](docs/screenshots/dashboard-demo.svg)
+
+The dashboard answers four questions quickly: what can run, which agents are
+active, what is running now, and whether anything needs approval.
+
+### A running agent
+
+![Agent Hub run detail demo](docs/screenshots/run-demo.svg)
+
+Each run has a stable ID, a workspace, model, cost, MCP scope, attempt number,
+and a live log. Approval-required actions stop at a visible human checkpoint.
+
+## Operating model
+
+The shortest way to understand Agent Hub is:
+
+1. The Hub owns schedules, run history, logs, and approvals.
+2. An agent is a named schedule plus a skill, workspace, prompt, and policy.
+3. A run is one execution attempt of that agent.
+4. The runner starts `claude` in the selected workspace.
+5. Outbound actions become approval artifacts before they are dispatched.
+
+The current release is single-node. It supports many agents on one trusted
+machine, but it does not coordinate multiple Hub processes. Read
+[`docs/OPERATING_MODEL.md`](docs/OPERATING_MODEL.md) before deploying it on
+multiple machines or designing a worker cluster.
 
 **One-time recommended setup:** unify your skills between `~/.claude/` and your
 configured managed skills repository:
@@ -572,6 +608,9 @@ agent-hub/
 │
 ├── bin/
 │   └── sync-skills.sh              Skill/command sync + launchd daemon
+├── docs/
+│   ├── OPERATING_MODEL.md          Single-node and cluster deployment model
+│   └── screenshots/                 Synthetic dashboard and run examples
 │
 ├── data/                           gitignored — runtime state
 │   ├── hub.db                      SQLite (WAL mode)
