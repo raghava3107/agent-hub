@@ -1,0 +1,107 @@
+SECURITY.md
+  s_826bb030b03dda::t_66985351f96246 1-20
+CONTRIBUTING.md
+  s_826bb030b03dda::t_66985351f96246 1-17
+.github/workflows/ci.yml
+  s_826bb030b03dda::t_66985351f96246 1-26
+LICENSE
+  s_826bb030b03dda::t_66985351f96246 1-21
+docs/DEPLOYMENT.md
+  s_826bb030b03dda::t_31e0a8c43d3dfb 1-140,142,144-388
+  s_826bb030b03dda::t_66985351f96246 141,143
+CODE_OF_CONDUCT.md
+  s_826bb030b03dda::t_66985351f96246 1-9
+bin/service.sh
+  s_826bb030b03dda::t_44e337f28e7e54 1-240
+README.md
+  s_826bb030b03dda::t_31e0a8c43d3dfb 1-10,17-27,41-73,92-708
+  s_826bb030b03dda::t_66985351f96246 11-16,28-40,74-91
+app/approvals.py
+  s_826bb030b03dda::t_35ccf7ba0deec5 1-134
+app/db.py
+  s_826bb030b03dda::t_dd87cbeb8583c6 1-161
+app/mcps.py
+  s_826bb030b03dda::t_3117f601710b0e 1-121
+app/runner.py
+  s_826bb030b03dda::t_e6f5896d952aa6 1-546
+app/scheduler.py
+  s_826bb030b03dda::t_97e17d452fab42 1-203
+app/skills.py
+  s_826bb030b03dda::t_5f9956e2ece7f8 1-104
+app/static/style.css
+  s_826bb030b03dda::t_30a1599663e37e 1-750
+app/templates/_activity.html
+  s_826bb030b03dda::t_f7c9d8a1862bc7 1-24
+app/templates/_allowed_tools_picker.html
+  s_826bb030b03dda::t_2964f0e9c66490 1-18
+app/templates/_dashboard_kpis.html
+  s_826bb030b03dda::t_cffa663f843c78 1-34
+app/templates/_icons/agent.html
+  s_826bb030b03dda::t_06c860ff52f137 1
+app/templates/_icons/check.html
+  s_826bb030b03dda::t_c85b802baf785f 1
+app/templates/_icons/dashboard.html
+  s_826bb030b03dda::t_2ad8f41117b026 1
+app/templates/_icons/folder.html
+  s_826bb030b03dda::t_962b21d90679f2 1
+app/templates/_icons/play.html
+  s_826bb030b03dda::t_63289099251f4d 1
+app/templates/_icons/plus.html
+  s_826bb030b03dda::t_4fea112eba1364 1
+app/templates/_icons/runs.html
+  s_826bb030b03dda::t_7d02a55312e555 1
+app/templates/_icons/search.html
+  s_826bb030b03dda::t_5b19271e1f3222 1
+app/templates/_icons/skills.html
+  s_826bb030b03dda::t_997c466bed77bd 1
+app/templates/_mcp_picker.html
+  s_826bb030b03dda::t_aadf333841e97d 1-35
+app/templates/_run_log.html
+  s_826bb030b03dda::t_04a498ce7b2601 1-7
+app/templates/_runs_table.html
+  s_826bb030b03dda::t_6342b0ae8691d9 1-29
+app/templates/_sched_builder.html
+  s_826bb030b03dda::t_2fda4877f39553 1-91
+app/templates/_upcoming.html
+  s_826bb030b03dda::t_327aea303e604e 1-29
+app/templates/agent_detail.html
+  s_826bb030b03dda::t_6b5e233bb63153 1-302
+app/templates/agents.html
+  s_826bb030b03dda::t_693e01262f60b8 1-267
+app/templates/approval_detail.html
+  s_826bb030b03dda::t_4a55c2ff7d86d3 1-37
+app/templates/approvals.html
+  s_826bb030b03dda::t_ef9ae91267229c 1-56
+app/templates/base.html
+  s_826bb030b03dda::t_7847561266e18f 1-68
+app/templates/dashboard.html
+  s_826bb030b03dda::t_55e0848efa1a64 1-86
+app/templates/repos.html
+  s_826bb030b03dda::t_0d459929ea5b1e 1-53
+app/templates/run_detail.html
+  s_826bb030b03dda::t_a2fd5f056b1bea 1-101
+app/templates/runs.html
+  s_826bb030b03dda::t_dad85bb7251abd 1-54
+app/templates/skills.html
+  s_826bb030b03dda::t_cb78d6467a3364 1-137
+app/timefmt.py
+  s_826bb030b03dda::t_a2cf13c1848015 1-120
+requirements.txt
+  s_826bb030b03dda::t_9f83aa0a219d14 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "bf2852776909967a78a708add63f216d0f8e7432",
+  "prompts": {},
+  "sessions": {
+    "s_826bb030b03dda": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a072b3-d27d-7b41-beec-2a0a845fb075",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Raghavendra Reddy <rkota@g2.com>"
+    }
+  }
+}
