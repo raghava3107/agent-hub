@@ -1,0 +1,23 @@
+config/local.example.json
+  s_826bb030b03dda::t_78d04575f521d9 8
+README.md
+  s_826bb030b03dda::t_ed1984d8aa1b1e 31-46
+  s_826bb030b03dda::t_78d04575f521d9 3-5,69-71,74,77,84-94
+  s_826bb030b03dda::t_0698002e3841dd 95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "3c0f494e97db576d7fda795cd75564b2aaaf97b0",
+  "prompts": {},
+  "sessions": {
+    "s_826bb030b03dda": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a072b3-d27d-7b41-beec-2a0a845fb075",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Raghavendra Reddy <rkota@g2.com>"
+    }
+  }
+}
