@@ -113,8 +113,8 @@ See [SECURITY.md](SECURITY.md) for reporting vulnerabilities.
 
 ## Screenshots
 
-These are synthetic demo screenshots. Names, counts, costs, repositories, and
-log lines are illustrative; no personal or production data is included.
+These are public demo screenshots. Names, counts, costs, repositories, and log
+lines are illustrative; no personal or production data is included.
 
 ### Dashboard overview
 
@@ -138,12 +138,15 @@ The `/agents` page is where you create schedules and manage the operating
 policy for each agent: skill, workspace, cadence, MCP scope, model, retries,
 timeouts, and approval behavior.
 
-### Create an agent in about two seconds
+### Selecting MCPs for an agent
 
-![Two-second agent creation walkthrough](docs/screenshots/create-agent-demo.gif)
+![Agent Hub MCP selection](docs/screenshots/agents-mcp-selection.png)
 
-The short walkthrough is intentionally synthetic: name the agent, choose its
-skill and workspace, select a cadence, and create it.
+The agent form lets you select MCP servers individually. Check only the MCPs
+the agent needs for an explicit least-privilege allowlist. If every checkbox is
+left empty, the agent inherits the MCP configuration from `~/.claude` instead
+of receiving no MCPs. This public example keeps the MCP names readable and
+omits the G2-specific local integration from the screenshot.
 
 ## Operating model
 
@@ -544,6 +547,10 @@ Deduped by name; earlier sources win.
 3. Deletes the temp file after the run exits (success or fail).
 
 Empty `allowed_mcps` (NULL) → no flags passed → all inherited from user config.
+
+In the UI, this means an empty selection deliberately means “inherit the user's
+configured MCPs.” Select one or more cards when an agent should use an explicit,
+restricted MCP set.
 
 ---
 
