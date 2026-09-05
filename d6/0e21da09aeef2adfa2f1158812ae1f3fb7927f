@@ -1,0 +1,30 @@
+docs/DEPLOYMENT.md
+  s_826bb030b03dda::t_444e0fc27f9c70 136
+  s_826bb030b03dda::t_d85723d75a1673 131-132
+docs/OPERATING_MODEL.md
+  s_826bb030b03dda::t_5e582074b57170 1-58
+docs/screenshots/dashboard-demo.svg
+  s_826bb030b03dda::t_5e582074b57170 1-34
+docs/screenshots/run-demo.svg
+  s_826bb030b03dda::t_5e582074b57170 1-14
+README.md
+  s_826bb030b03dda::t_1cb0a5dbf41694 29-42,95-127
+  s_826bb030b03dda::t_d85723d75a1673 611-613
+  s_826bb030b03dda::t_b6f6842dc56128 128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "d60e21da09aeef2adfa2f1158812ae1f3fb7927f",
+  "prompts": {},
+  "sessions": {
+    "s_826bb030b03dda": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a072b3-d27d-7b41-beec-2a0a845fb075",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Raghavendra Reddy <rkota@g2.com>"
+    }
+  }
+}
