@@ -5,6 +5,6 @@
     "port": 8765
   },
   "skills": {
-    "managed_repo": "/Users/yourname/WorkSpace/my-agents"
+    "managed_repo": "/path/to/your/my-agents"
   }
 }

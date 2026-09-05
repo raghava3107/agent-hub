@@ -1,5 +1,8 @@
 # Spidey
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-3776AB.svg)](https://www.python.org/)
+
 A local dashboard for running, scheduling, and observing Claude Code skills across
 any folder on your machine — with per-agent MCP scoping, cost/turn/timeout caps,
 retries, autopilot, failure notifications, and a draft-first approval queue for
@@ -25,21 +28,22 @@ cost, when to consider a server), see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 
 1. [What it is / what it isn't](#what-it-is--what-it-isnt)
 2. [Quick start](#quick-start)
-3. [Security](#security)
-4. [Screenshots](#screenshots)
-5. [Operating model](#operating-model)
-6. [Architecture: what happens when an agent runs](#architecture-what-happens-when-an-agent-runs)
-7. [UI overview — every page](#ui-overview--every-page)
-8. [Data model — every table + every column](#data-model--every-table--every-column)
-9. [Agent-level settings](#agent-level-settings)
-10. [MCP scoping](#mcp-scoping)
-11. [Approvals + safety model](#approvals--safety-model)
-12. [Skill sync](#skill-sync)
-13. [Files & directory layout](#files--directory-layout)
-14. [Environment variables](#environment-variables)
-15. [Extending — wiring real senders, custom skills](#extending--wiring-real-senders-custom-skills)
-16. [Troubleshooting](#troubleshooting)
-17. [Roadmap](#roadmap)
+3. [License and third-party services](#license-and-third-party-services)
+4. [Security](#security)
+5. [Screenshots](#screenshots)
+6. [Operating model](#operating-model)
+7. [Architecture: what happens when an agent runs](#architecture-what-happens-when-an-agent-runs)
+8. [UI overview — every page](#ui-overview--every-page)
+9. [Data model — every table + every column](#data-model--every-table--every-column)
+10. [Agent-level settings](#agent-level-settings)
+11. [MCP scoping](#mcp-scoping)
+12. [Approvals + safety model](#approvals--safety-model)
+13. [Skill sync](#skill-sync)
+14. [Files & directory layout](#files--directory-layout)
+15. [Environment variables](#environment-variables)
+16. [Extending — wiring real senders, custom skills](#extending--wiring-real-senders-custom-skills)
+17. [Troubleshooting](#troubleshooting)
+18. [Roadmap](#roadmap)
 
 ---
 
@@ -62,17 +66,32 @@ cost, when to consider a server), see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
 
 ## Quick start
 
-Requires Python 3.9+, `claude` on your `PATH` (already the case if you use Claude Code).
+Requires Python 3.9+, Bash, and the `claude` CLI on your `PATH`.
+
+Clone the repository and start the local Hub:
 
 ```bash
+git clone https://github.com/raghava3107/agent-hub.git
 cd agent-hub
 cp config/local.example.json config/local.json
-# Edit config/local.json and set skills.managed_repo to your my-agents checkout.
+# Edit config/local.json and set skills.managed_repo to your skills checkout.
 ./run.sh
 ```
 
 First run creates `.venv/`, installs deps from `requirements.txt`, and starts uvicorn.
 Open http://127.0.0.1:8765.
+
+The first run creates a local virtual environment and installs the Python
+dependencies. The Hub does not install Claude Code, MCP servers, or their
+credentials for you.
+
+## License and third-party services
+
+Agent Hub is released under the [MIT License](LICENSE). Claude Code, the
+`claude` CLI, MCP servers, model providers, and any integrations you connect
+are third-party software or services with separate terms, credentials, and
+usage costs. You are responsible for complying with those terms and for
+protecting any credentials used by your agents.
 
 ## Security
 
