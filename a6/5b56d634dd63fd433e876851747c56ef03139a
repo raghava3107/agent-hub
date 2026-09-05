@@ -1,0 +1,20 @@
+README.md
+  s_826bb030b03dda::t_fe2e39490f5607 116-117,141,143,145-149,551-553
+  s_826bb030b03dda::t_1afb89cc469e7a 554
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "a65b56d634dd63fd433e876851747c56ef03139a",
+  "prompts": {},
+  "sessions": {
+    "s_826bb030b03dda": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a072b3-d27d-7b41-beec-2a0a845fb075",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Raghavendra Reddy <rkota@g2.com>"
+    }
+  }
+}
