@@ -138,6 +138,13 @@ The `/agents` page is where you create schedules and manage the operating
 policy for each agent: skill, workspace, cadence, MCP scope, model, retries,
 timeouts, and approval behavior.
 
+### Create an agent in about two seconds
+
+![Two-second agent creation walkthrough](docs/screenshots/create-agent-demo.gif)
+
+The short walkthrough is intentionally synthetic: name the agent, choose its
+skill and workspace, select a cadence, and create it.
+
 ## Operating model
 
 The shortest way to understand Agent Hub is:
