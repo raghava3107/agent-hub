@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Spidey{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<style>:root { --sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif; }</style>
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a href="/" class="brand">
+      <span class="logo">SP</span>
+      <span class="name"><span class="name-red">Spi</span><span class="name-blue">dey</span></span>
+    </a>
+
+    <div class="nav-section">Workspace</div>
+    <a href="/" class="nav-link {% if active == 'dashboard' %}active{% endif %}">
+      {% include "_icons/dashboard.html" %} Dashboard
+    </a>
+    <a href="/agents" class="nav-link {% if active == 'agents' %}active{% endif %}">
+      {% include "_icons/agent.html" %} Agents
+      {% if nav.agents %}<span class="badge-num">{{ nav.agents }}</span>{% endif %}
+    </a>
+    <a href="/runs" class="nav-link {% if active == 'runs' %}active{% endif %}">
+      {% include "_icons/runs.html" %} Runs
+      {% if nav.running %}<span class="badge-num">{{ nav.running }}</span>{% endif %}
+    </a>
+    <a href="/approvals" class="nav-link {% if active == 'approvals' %}active{% endif %}">
+      {% include "_icons/check.html" %} Approvals
+      {% if nav.approvals %}<span class="badge-num">{{ nav.approvals }}</span>{% endif %}
+    </a>
+
+    <div class="nav-section">Library</div>
+    <a href="/skills" class="nav-link {% if active == 'skills' %}active{% endif %}">
+      {% include "_icons/skills.html" %} Skills
+      {% if nav.skills %}<span class="badge-num">{{ nav.skills }}</span>{% endif %}
+    </a>
+    <a href="/repos" class="nav-link {% if active == 'repos' %}active{% endif %}">
+      {% include "_icons/folder.html" %} Repos
+      {% if nav.repos %}<span class="badge-num">{{ nav.repos }}</span>{% endif %}
+    </a>
+
+    <div class="sidebar-footer">
+      <div>Local · 127.0.0.1:8765</div>
+      <div style="margin-top:2px">v1</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1>{% block page_title %}{% endblock %}</h1>
+        {% block subtitle %}{% endblock %}
+      </div>
+      <div class="actions">{% block topbar_actions %}{% endblock %}</div>
+    </div>
+    <div class="content">
+      {% block body %}{% endblock %}
+    </div>
+  </main>
+</div>
+</body>
+</html>

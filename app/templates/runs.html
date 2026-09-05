@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block page_title %}Runs{% endblock %}
+{% block subtitle %}<div class="subtitle">Every agent run, manual or scheduled</div>{% endblock %}
+
+{% block body %}
+
+<div class="panel" style="margin-bottom:16px">
+  <div class="panel-head">
+    <h2>Coming up next</h2>
+    <span class="muted small">upcoming scheduled fires · {{ DISPLAY_TZ_NAME }} · live</span>
+  </div>
+  <div class="panel-body no-pad"
+       hx-get="/partials/dashboard-upcoming"
+       hx-trigger="every 5s"
+       hx-swap="innerHTML">
+    {% include "_upcoming.html" %}
+  </div>
+</div>
+
+<form method="get" class="toolbar">
+  <div class="search-input">
+    <span class="ico">{% include "_icons/search.html" %}</span>
+    <input name="q" value="{{ q }}" placeholder="Search by skill name or path…">
+  </div>
+  <div class="filter-chips">
+    <a class="btn {% if not status %}on{% endif %}" href="/runs{% if q %}?q={{ q }}{% endif %}">All</a>
+    <a class="btn {% if status == 'running' %}on{% endif %}" href="/runs?status=running{% if q %}&q={{ q }}{% endif %}">Running</a>
+    <a class="btn {% if status == 'completed' %}on{% endif %}" href="/runs?status=completed{% if q %}&q={{ q }}{% endif %}">Completed</a>
+    <a class="btn {% if status == 'failed' %}on{% endif %}" href="/runs?status=failed{% if q %}&q={{ q }}{% endif %}">Failed</a>
+    <a class="btn {% if status == 'queued' %}on{% endif %}" href="/runs?status=queued{% if q %}&q={{ q }}{% endif %}"
+       title="Runs about to start — a sub-second race window. See 'Coming up next' above for scheduled fires.">Queued now</a>
+  </div>
+</form>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>
+      {% if status == 'queued' %}Queued right now
+      {% elif status %}{{ status | capitalize }} runs
+      {% else %}Recent runs{% endif %}
+    </h2>
+    {% if status == 'queued' %}
+      <span class="muted small">only shows runs currently between "row inserted" and "subprocess spawned" (sub-second)</span>
+    {% endif %}
+  </div>
+  <div class="panel-body no-pad"
+       hx-get="/partials/runs?status={{ status }}&q={{ q }}"
+       hx-trigger="every 3s"
+       hx-swap="innerHTML">
+    {% include "_runs_table.html" %}
+  </div>
+</div>
+
+{% endblock %}

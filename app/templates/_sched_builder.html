@@ -1,0 +1,91 @@
+{# args:
+     sched (dict): sched_type, every_n, sched_time, minute, dow, dom, cron_expr — pre-filled for edit; may be omitted for create
+     weekdays (list of [n, label])
+   Emits form fields: sched_type, every_n, sched_time, minute, dow, dom, cron_expr
+#}
+{% set s = sched if sched is defined else {} %}
+{% set _type = s.get('sched_type', 'every_minutes') %}
+{% set _every = s.get('every_n', 15) %}
+{% set _time = s.get('sched_time', '09:00') %}
+{% set _min = s.get('minute', 5) %}
+{% set _dow = s.get('dow', 1) %}
+{% set _dom = s.get('dom', 1) %}
+{% set _cron = s.get('cron_expr', '') %}
+
+<div class="sched-builder">
+  <label class="sched-type-label">Schedule
+    <select name="sched_type" onchange="rrToggleSched(this)">
+      <option value="every_minutes" {% if _type == 'every_minutes' %}selected{% endif %}>Every N minutes</option>
+      <option value="hourly"        {% if _type == 'hourly'        %}selected{% endif %}>Every hour</option>
+      <option value="daily"         {% if _type == 'daily'         %}selected{% endif %}>Daily</option>
+      <option value="weekly"        {% if _type == 'weekly'        %}selected{% endif %}>Weekly</option>
+      <option value="monthly"       {% if _type == 'monthly'       %}selected{% endif %}>Monthly</option>
+      <option value="custom"        {% if _type == 'custom'        %}selected{% endif %}>Custom cron</option>
+    </select>
+  </label>
+
+  <div class="sched-fields" data-shows="every_minutes" {% if _type != 'every_minutes' %}hidden{% endif %}>
+    <label>Every
+      <input name="every_n" type="number" min="1" max="59" value="{{ _every }}" style="max-width:80px" {% if _type != 'every_minutes' %}disabled{% endif %}>
+    </label>
+    <span class="sched-suffix">minutes</span>
+  </div>
+
+  <div class="sched-fields" data-shows="hourly" {% if _type != 'hourly' %}hidden{% endif %}>
+    <label>At minute
+      <input name="minute" type="number" min="0" max="59" value="{{ _min }}" style="max-width:80px" {% if _type != 'hourly' %}disabled{% endif %}>
+    </label>
+    <span class="sched-suffix">of every hour</span>
+  </div>
+
+  <div class="sched-fields" data-shows="daily" {% if _type != 'daily' %}hidden{% endif %}>
+    <label>At
+      <input name="sched_time" type="time" value="{{ _time }}" style="max-width:120px" {% if _type != 'daily' %}disabled{% endif %}>
+    </label>
+    <span class="sched-suffix">every day</span>
+  </div>
+
+  <div class="sched-fields" data-shows="weekly" {% if _type != 'weekly' %}hidden{% endif %}>
+    <label>Every
+      <select name="dow" style="max-width:110px" {% if _type != 'weekly' %}disabled{% endif %}>
+        {% for n, label in weekdays %}
+          <option value="{{ n }}" {% if _dow == n %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>at
+      <input name="sched_time" type="time" value="{{ _time }}" style="max-width:120px" {% if _type != 'weekly' %}disabled{% endif %}>
+    </label>
+  </div>
+
+  <div class="sched-fields" data-shows="monthly" {% if _type != 'monthly' %}hidden{% endif %}>
+    <label>On day
+      <input name="dom" type="number" min="1" max="31" value="{{ _dom }}" style="max-width:80px" {% if _type != 'monthly' %}disabled{% endif %}>
+    </label>
+    <label>at
+      <input name="sched_time" type="time" value="{{ _time }}" style="max-width:120px" {% if _type != 'monthly' %}disabled{% endif %}>
+    </label>
+    <span class="sched-suffix">every month</span>
+  </div>
+
+  <div class="sched-fields" data-shows="custom" {% if _type != 'custom' %}hidden{% endif %}>
+    <label>Cron expression
+      <input name="cron_expr" value="{{ _cron }}" placeholder="*/10 * * * *" {% if _type != 'custom' %}disabled{% endif %}>
+    </label>
+    <span class="sched-suffix">min hour dom mon dow · UTC</span>
+  </div>
+</div>
+
+<script>
+window.rrToggleSched = window.rrToggleSched || function(sel) {
+  var scope = sel.closest('.sched-builder');
+  var picked = sel.value;
+  scope.querySelectorAll('.sched-fields').forEach(function(el) {
+    var active = (el.getAttribute('data-shows') === picked);
+    el.hidden = !active;
+    el.querySelectorAll('input, select').forEach(function(field) {
+      field.disabled = !active;
+    });
+  });
+};
+</script>

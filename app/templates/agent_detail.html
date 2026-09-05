@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% block page_title %}{{ agent.name }}{% endblock %}
+{% block subtitle %}<div class="subtitle">Agent · runs every <code>{{ agent.cron_expr }}</code></div>{% endblock %}
+{% block topbar_actions %}
+  <form action="/agents/{{ agent.id }}/run-now" method="post"><button class="btn primary">{% include "_icons/play.html" %} Run now</button></form>
+  <form action="/agents/{{ agent.id }}/toggle" method="post">
+    <button class="btn">{{ 'Pause' if agent.enabled else 'Resume' }}</button>
+  </form>
+  <form action="/agents/{{ agent.id }}/delete" method="post"
+        onsubmit="return confirm('Delete agent \'{{ agent.name }}\'?');">
+    <button class="btn danger">Delete</button>
+  </form>
+{% endblock %}
+
+{% block body %}
+<div class="crumbs"><a href="/agents">← Agents</a></div>
+
+<div class="kpis">
+  <div class="kpi">
+    <div class="kpi-head"><span class="kpi-label">Total runs</span></div>
+    <div class="kpi-value">{{ stats.total or 0 }}</div>
+    <div class="kpi-sub">Since {{ agent.created_at | ist_date }}</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-head"><span class="kpi-label">Successful</span><span class="kpi-icon ok">{% include "_icons/check.html" %}</span></div>
+    <div class="kpi-value">{{ stats.ok or 0 }}</div>
+    <div class="kpi-sub">
+      {% if stats.total %}{{ (100 * stats.ok / stats.total) | round(1) }}% success rate{% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-head"><span class="kpi-label">Failed</span></div>
+    <div class="kpi-value">{{ stats.err or 0 }}</div>
+    <div class="kpi-sub">exit code ≠ 0</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-head"><span class="kpi-label">Cost</span></div>
+    <div class="kpi-value">${{ '%.4f' % (stats.cost or 0) }}</div>
+    <div class="kpi-sub">Cumulative</div>
+  </div>
+</div>
+
+{% if agent.notes %}
+<div class="panel" style="margin-bottom:20px">
+  <div class="panel-body">
+    <div class="muted small" style="margin-bottom:4px">Notes</div>
+    <div>{{ agent.notes }}</div>
+  </div>
+</div>
+{% endif %}
+
+<div class="panel" style="margin-bottom:20px">
+  <div class="panel-head">
+    <h2>Overview</h2>
+    <div class="pill-row">
+      {% if agent.autopilot %}<span class="badge on">autopilot</span>{% endif %}
+      {% if agent.notify_on_failure %}<span class="badge pending">notify on failure</span>{% endif %}
+      {% if agent.retry_count %}<span class="badge queued">retries: {{ agent.retry_count }}</span>{% endif %}
+      {% if agent.timeout_seconds %}<span class="badge queued">timeout: {{ agent.timeout_seconds }}s</span>{% endif %}
+      <span class="badge {{ 'queued' if agent.model else 'off' }}">
+        {% if agent.model %}model: {{ agent.model }}{% else %}model: inherit → {{ inherit_model }}{% endif %}
+      </span>
+      {% if agent.permission_mode %}<span class="badge queued">{{ agent.permission_mode }}</span>{% endif %}
+      {% if next_run_time %}
+        <span class="badge running">next run: {{ next_run_time | ist }} · {{ next_run_time | rel }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="field-grid">
+      <div><div class="muted small">Skill</div><code>{{ agent.skill_name }}</code> <span class="tag {{ agent.skill_kind }}">{{ agent.skill_kind }}</span></div>
+      <div><div class="muted small">Repo</div>{{ agent.repo_name or '<span class="muted">custom</span>' | safe }}</div>
+      <div><div class="muted small">Cron</div><code>{{ agent.cron_expr }}</code></div>
+      <div><div class="muted small">Status</div>
+        {% if agent.enabled %}<span class="badge on">enabled</span>{% else %}<span class="badge off">paused</span>{% endif %}
+      </div>
+      <div style="grid-column:1/-1"><div class="muted small">Working directory</div><code>{{ agent.working_directory }}</code></div>
+      <div style="grid-column:1/-1">
+        <div class="muted small">MCPs</div>
+        {% if picked_mcps %}
+          <div class="mcp-badges">
+            {% for n in picked_mcps %}<span class="mcp-badge">{{ n }}</span>{% endfor %}
+          </div>
+        {% else %}
+          <span class="mcp-badge all">inheriting all ({{ mcps|length }})</span>
+        {% endif %}
+      </div>
+      <div style="grid-column:1/-1"><div class="muted small">Prompt</div><pre class="prompt-box">{{ agent.prompt }}</pre></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel" style="margin-bottom:20px">
+  <div class="panel-head">
+    <h2>Settings</h2>
+    <span class="muted small">edit any field and save</span>
+  </div>
+  <div class="panel-body">
+    <form action="/agents/{{ agent.id }}/settings" method="post">
+      <div style="margin-bottom:12px">
+        {% include "_sched_builder.html" %}
+      </div>
+      <div class="adv-grid">
+        <label>Name<input name="name" value="{{ agent.name }}"></label>
+        <label>Model
+          <select name="model">
+            <option value="" {% if not agent.model %}selected{% endif %}>inherit / default</option>
+            {% for m in ["claude-opus-4-8","claude-sonnet-4-6","claude-haiku-4-5-20251001","claude-fable-5"] %}
+              <option value="{{ m }}" {% if agent.model == m %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Permission mode
+          <select name="permission_mode">
+            <option value="" {% if not agent.permission_mode %}selected{% endif %}>inherit (acceptEdits)</option>
+            {% for p, label in [
+                 ('plan','plan — read-only'),
+                 ('acceptEdits','acceptEdits — files only'),
+                 ('bypassPermissions','bypassPermissions — bash/git/gh unrestricted'),
+                 ('default','default (interactive)')] %}
+              <option value="{{ p }}" {% if agent.permission_mode == p %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>Max turns
+          <input name="max_turns" type="number" min="1" value="{{ agent.max_turns or '' }}" placeholder="unlimited">
+        </label>
+        <label>Max cost per run ($)
+          <input name="max_cost_usd" type="number" step="0.01" min="0" value="{{ agent.max_cost_usd or '' }}" placeholder="no cap">
+        </label>
+        <label>Timeout (seconds)
+          <input name="timeout_seconds" type="number" min="10" value="{{ agent.timeout_seconds or '' }}" placeholder="none">
+        </label>
+        <label>Retry count on failure
+          <input name="retry_count" type="number" min="0" value="{{ agent.retry_count or 0 }}">
+        </label>
+        <label>Retry delay (seconds)
+          <input name="retry_delay_seconds" type="number" min="1" value="{{ agent.retry_delay_seconds or 60 }}">
+        </label>
+        <label class="checkbox">
+          <input name="autopilot" type="checkbox" value="1" {% if agent.autopilot %}checked{% endif %}>
+          <span>Autopilot: auto-approve outbound actions</span>
+        </label>
+        <label class="checkbox">
+          <input name="notify_on_failure" type="checkbox" value="1" {% if agent.notify_on_failure %}checked{% endif %}>
+          <span>Notify on failure (queues Slack draft)</span>
+        </label>
+        <label style="grid-column:1/-1">Notify target (Slack channel or @user)
+          <input name="notify_target" value="{{ agent.notify_target or '' }}" placeholder="#eng-alerts or @your-username">
+        </label>
+        <label style="grid-column:1/-1">Environment variables (KEY=value per line)
+          <textarea name="env_vars" rows="4" placeholder="GITHUB_TOKEN=ghp_...">{% if agent.env_vars %}{% for k, v in (agent.env_vars | fromjson).items() %}{{ k }}={{ v }}
+{% endfor %}{% endif %}</textarea>
+        </label>
+        <label style="grid-column:1/-1">Prompt
+          <textarea name="prompt" rows="3">{{ agent.prompt }}</textarea>
+        </label>
+        <label style="grid-column:1/-1">Notes
+          <textarea name="notes" rows="2" placeholder="Free-text notes about this agent">{{ agent.notes or '' }}</textarea>
+        </label>
+        <div style="grid-column:1/-1">
+          {% set _extras = (agent.extra_allowed_tools | fromjson) | join('\n') if agent.extra_allowed_tools else '' %}
+          {% with defaults=DEFAULT_ALLOWED_TOOLS, extras=_extras %}
+            {% include "_allowed_tools_picker.html" %}
+          {% endwith %}
+        </div>
+      </div>
+      <div style="margin-top:12px"><button class="btn primary" type="submit">Save settings</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="panel" style="margin-bottom:20px">
+  <div class="panel-head">
+    <h2>Steps</h2>
+    <span class="muted small">runs sequentially · step 1 = primary skill</span>
+  </div>
+  <div class="panel-body no-pad">
+    <table>
+      <thead><tr><th>#</th><th>Skill</th><th>Prompt</th><th>On error</th><th></th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>1</strong></td>
+          <td><code>{{ agent.skill_name }}</code> <span class="tag {{ agent.skill_kind }}">{{ agent.skill_kind }}</span></td>
+          <td class="small muted">{{ (agent.prompt or '')[:120] }}{% if (agent.prompt or '')|length > 120 %}…{% endif %}</td>
+          <td><span class="muted small">stop chain</span></td>
+          <td class="small muted">primary</td>
+        </tr>
+        {% for s in extra_steps %}
+        <tr>
+          <td><strong>{{ loop.index + 1 }}</strong></td>
+          <td><code>{{ s.skill_name }}</code> <span class="tag {{ s.skill_kind }}">{{ s.skill_kind }}</span></td>
+          <td class="small muted">{{ (s.prompt or '')[:120] }}{% if (s.prompt or '')|length > 120 %}…{% endif %}</td>
+          <td>
+            {% if s.continue_on_error %}
+              <span class="badge on">continue</span>
+            {% else %}
+              <span class="badge off">stop</span>
+            {% endif %}
+          </td>
+          <td class="row-actions-inline">
+            <form action="/agents/{{ agent.id }}/steps/{{ s.id }}/move" method="post" style="display:inline">
+              <input type="hidden" name="direction" value="up">
+              <button class="tiny ghost" title="Move up">↑</button>
+            </form>
+            <form action="/agents/{{ agent.id }}/steps/{{ s.id }}/move" method="post" style="display:inline">
+              <input type="hidden" name="direction" value="down">
+              <button class="tiny ghost" title="Move down">↓</button>
+            </form>
+            <form action="/agents/{{ agent.id }}/steps/{{ s.id }}/delete" method="post" style="display:inline"
+                  onsubmit="return confirm('Remove step {{ loop.index + 1 }}?');">
+              <button class="tiny danger" title="Remove">×</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="panel-body" style="border-top:1px solid var(--border)">
+    <details>
+      <summary><strong>+ Add step</strong></summary>
+      <form action="/agents/{{ agent.id }}/steps" method="post" class="adv-grid" style="margin-top:12px">
+        <label style="grid-column:1/-1">Skill
+          <select name="__skill_ref" required onchange="const p=this.value.split('|'); this.form.skill_name.value=p[0]; this.form.skill_kind.value=p[1];">
+            <option value="">— choose —</option>
+            {% for s in all_skills %}
+              <option value="{{ s.name }}|{{ s.kind }}">{{ s.name }} ({{ s.kind }})</option>
+            {% endfor %}
+          </select>
+          <input type="hidden" name="skill_name"><input type="hidden" name="skill_kind">
+        </label>
+        <label style="grid-column:1/-1">Prompt
+          <textarea name="prompt" rows="2" placeholder="What should this step do?"></textarea>
+        </label>
+        <label class="checkbox">
+          <input name="continue_on_error" type="checkbox" value="1">
+          <span>Continue chain even if this step fails</span>
+        </label>
+        <div style="grid-column:1/-1"><button class="btn primary" type="submit">Add step</button></div>
+      </form>
+    </details>
+  </div>
+</div>
+
+<div class="panel" style="margin-bottom:20px">
+  <div class="panel-head">
+    <h2>MCP servers</h2>
+    <span class="muted small">
+      {% if picked_mcps %}{{ picked_mcps|length }} of {{ mcps|length }} enabled
+      {% else %}inheriting all ({{ mcps|length }} available){% endif %}
+    </span>
+  </div>
+  <div class="panel-body">
+    <form action="/agents/{{ agent.id }}/mcps" method="post">
+      {% include "_mcp_picker.html" %}
+      <div style="margin-top:12px"><button class="primary" type="submit">Save MCP selection</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head"><h2>Run history ({{ runs|length }})</h2></div>
+  <div class="panel-body no-pad">
+    <table>
+      <thead><tr><th>#</th><th>Step</th><th>Attempt</th><th>Status</th><th>Started</th><th>Finished</th><th>Cost</th><th></th></tr></thead>
+      <tbody>
+        {% for r in runs %}
+        <tr>
+          <td>{{ r.id }}</td>
+          <td>
+            {% if r.parent_run_id %}
+              <span class="badge queued">#{{ (r.step_position or 0) + 1 }}</span>
+              <span class="muted small">of chain <a href="/runs/{{ r.parent_run_id }}">#{{ r.parent_run_id }}</a></span>
+            {% elif r.step_position %}
+              <span class="badge queued">#1</span>
+            {% else %}
+              <span class="muted small">—</span>
+            {% endif %}
+          </td>
+          <td>{% if r.attempt_number and r.attempt_number > 1 %}<span class="badge queued">#{{ r.attempt_number }}</span>{% else %}—{% endif %}</td>
+          <td>
+            <span class="badge {{ r.status }}">{{ r.status }}</span>
+            {% if r.timed_out %}<span class="badge failed">timeout</span>{% endif %}
+          </td>
+          <td class="small">
+            {{ r.started_at | ist }}
+            {% if r.started_at %}<div class="muted small">{{ r.started_at | rel }}</div>{% endif %}
+          </td>
+          <td class="small">{{ (r.finished_at | ist) or '—' }}</td>
+          <td>{% if r.total_cost_usd %}${{ '%.4f' % r.total_cost_usd }}{% else %}<span class="muted">—</span>{% endif %}</td>
+          <td><a href="/runs/{{ r.id }}">open →</a></td>
+        </tr>
+        {% else %}
+        <tr class="empty-row"><td colspan="8">No runs yet. Click <strong>Run now</strong> to trigger one.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

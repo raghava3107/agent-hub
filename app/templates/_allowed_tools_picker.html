@@ -1,0 +1,18 @@
+{# Args: defaults (list of default patterns), extras (str existing value, may be empty), name_attr (default 'extra_allowed_tools') #}
+{% set _defaults = defaults if defaults is defined else [] %}
+{% set _extras = extras if extras is defined else '' %}
+{% set _name = name_attr if name_attr is defined else 'extra_allowed_tools' %}
+<div class="tools-picker">
+  <div class="tools-picker-head">
+    <strong>Allowed tool patterns</strong>
+    <span class="muted small">every run gets git + gh by default; add more below</span>
+  </div>
+  <div class="tools-default-row">
+    <span class="muted small">Always on:</span>
+    {% for p in _defaults %}<span class="tool-badge default">{{ p }}</span>{% endfor %}
+  </div>
+  <label class="tools-extra-label">
+    Extra patterns (one per line — e.g. <code>Bash(npm *)</code>, <code>Bash(curl *)</code>, <code>WebFetch</code>)
+    <textarea name="{{ _name }}" rows="3" placeholder="Bash(npm *)&#10;Bash(pytest *)">{{ _extras or '' }}</textarea>
+  </label>
+</div>

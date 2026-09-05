@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block page_title %}Approvals{% endblock %}
+{% block subtitle %}<div class="subtitle">Draft-first queue for outbound actions</div>{% endblock %}
+
+{% block body %}
+
+<div class="toolbar">
+  <div class="filter-chips">
+    <a class="btn {% if status == 'pending' %}on{% endif %}" href="/approvals">Pending</a>
+    <a class="btn {% if status == 'approved' %}on{% endif %}" href="/approvals?status=approved">Approved</a>
+    <a class="btn {% if status == 'rejected' %}on{% endif %}" href="/approvals?status=rejected">Rejected</a>
+    <a class="btn {% if status == 'all' %}on{% endif %}" href="/approvals?status=all">All</a>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-body no-pad">
+    {% if approvals %}
+    <table>
+      <thead>
+        <tr><th>#</th><th>Kind</th><th>Target</th><th>Run</th><th>Status</th><th>Created</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for a in approvals %}
+        <tr>
+          <td>{{ a.id }}</td>
+          <td><span class="tag {{ a.kind }}">{{ a.kind }}</span></td>
+          <td class="small"><code>{{ a.target }}</code></td>
+          <td>{% if a.run_id %}<a href="/runs/{{ a.run_id }}">#{{ a.run_id }}</a>{% else %}—{% endif %}</td>
+          <td><span class="badge {{ a.status }}">{{ a.status }}</span></td>
+          <td class="small">{{ a.created_at }}</td>
+          <td class="row-actions-inline">
+            <a class="btn tiny" href="/approvals/{{ a.id }}">View</a>
+            {% if a.status == 'pending' %}
+            <form action="/approvals/{{ a.id }}/approve" method="post" style="display:inline">
+              <button class="tiny primary">Approve</button>
+            </form>
+            <form action="/approvals/{{ a.id }}/reject" method="post" style="display:inline">
+              <button class="tiny">Reject</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="panel-body center muted" style="padding:32px">
+      No {{ status }} approvals. Agents that want to post externally drop JSON files in
+      <code>&lt;cwd&gt;/.agent-hub-inbox/</code> — they land here.
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

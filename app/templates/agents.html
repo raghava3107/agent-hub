@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% block page_title %}Agents{% endblock %}
+{% block subtitle %}<div class="subtitle">Scheduled skills · tracked runs · success metrics</div>{% endblock %}
+{% block topbar_actions %}
+  <button class="btn primary" onclick="document.getElementById('new-agent').open=true; window.scrollTo({top:0,behavior:'smooth'});">
+    {% include "_icons/plus.html" %} New agent
+  </button>
+{% endblock %}
+
+{% block body %}
+
+<details class="panel" id="new-agent" style="margin-bottom:20px">
+  <summary style="padding:14px 18px; background:var(--panel-2); border-bottom:1px solid var(--border);">
+    <strong>+ Create a new agent</strong>
+    <span class="muted small">Pick a skill, a repo, and a schedule</span>
+  </summary>
+  <div class="panel-body">
+    <form action="/agents" method="post" style="display:grid; gap:12px; grid-template-columns:1fr 1fr;">
+      <label>Name<input name="name" required placeholder="e.g. PR reviewer (g2)"></label>
+      <label>Step 1 — Skill
+        <select name="__skill_ref_0" required onchange="const p=this.value.split('|'); this.form.skill_name.value=p[0]; this.form.skill_kind.value=p[1];">
+          <option value="">— choose a skill —</option>
+          {% for s in skills %}
+            <option value="{{ s.name }}|{{ s.kind }}">{{ s.name }} ({{ s.kind }})</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="skill_name"><input type="hidden" name="skill_kind">
+      </label>
+      <label>Repo
+        <select name="repo_id">
+          <option value="">— or working directory below —</option>
+          {% for r in repos %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}
+        </select>
+      </label>
+      <label style="grid-column:1/-1">Working directory (if no repo)
+        <input name="working_directory" placeholder="/absolute/path">
+      </label>
+      <label>Model (which Claude runs this)
+        <select name="model">
+          <option value="">inherit — uses ~/.claude/settings.json (opus)</option>
+          <option value="haiku">haiku — cheapest, fastest, good for polling</option>
+          <option value="sonnet" selected>sonnet — balanced default</option>
+          <option value="opus">opus — most capable, most expensive</option>
+          <option value="fable">fable — experimental</option>
+        </select>
+      </label>
+      <label>Permission mode
+        <select name="permission_mode">
+          <option value="">inherit (acceptEdits)</option>
+          <option value="plan">plan — read-only</option>
+          <option value="acceptEdits">acceptEdits — files only</option>
+          <option value="bypassPermissions">bypassPermissions — bash/git/gh allowed</option>
+        </select>
+      </label>
+      <div style="grid-column:1/-1">
+        {% include "_sched_builder.html" %}
+      </div>
+      <label style="grid-column:1/-1">Step 1 — Prompt / goal
+        <textarea name="prompt" rows="3" placeholder="What should step 1 do?"></textarea>
+      </label>
+
+      <details class="adv-block" style="grid-column:1/-1">
+        <summary><strong>+ Additional steps</strong> <span class="muted small">runs sequentially after step 1</span></summary>
+        <div id="rr-extra-steps"></div>
+        <button type="button" class="btn tiny" onclick="rrAddStep()" style="margin-top:8px">
+          {% include "_icons/plus.html" %} Add step
+        </button>
+      </details>
+
+      <template id="rr-step-tpl">
+        <div class="step-row">
+          <div class="step-row-head">
+            <strong>Step __N__</strong>
+            <button type="button" class="link-btn" onclick="this.closest('.step-row').remove()">× remove</button>
+          </div>
+          <label>Skill
+            <select onchange="const p=this.value.split('|'); const r=this.closest('.step-row'); r.querySelector('.sn').value=p[0]; r.querySelector('.sk').value=p[1];">
+              <option value="">— choose —</option>
+              {% for s in skills %}
+                <option value="{{ s.name }}|{{ s.kind }}">{{ s.name }} ({{ s.kind }})</option>
+              {% endfor %}
+            </select>
+            <input type="hidden" class="sn" name="step_skill_name">
+            <input type="hidden" class="sk" name="step_skill_kind">
+          </label>
+          <label>Prompt
+            <textarea name="step_prompt" rows="2" placeholder="What should this step do?"></textarea>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="step_continue_on_error" value="__N__">
+            <span>Continue chain even if this step fails</span>
+          </label>
+        </div>
+      </template>
+
+      <label style="grid-column:1/-1">Notes (optional, for your reference)
+        <textarea name="notes" rows="2" placeholder="Why this agent exists, links, context…"></textarea>
+      </label>
+
+      <script>
+      window.rrAddStep = window.rrAddStep || function () {
+        var wrap = document.getElementById('rr-extra-steps');
+        var tpl = document.getElementById('rr-step-tpl').innerHTML;
+        var n = wrap.children.length + 2; // step 1 is the primary, so extras start at 2
+        var html = tpl.replaceAll('__N__', String(n - 2));  // 0-indexed for form arrays
+        var frag = document.createElement('div');
+        frag.innerHTML = html;
+        var row = frag.firstElementChild;
+        row.querySelector('.step-row-head strong').textContent = 'Step ' + n;
+        wrap.appendChild(row);
+      };
+      </script>
+      <div style="grid-column:1/-1">
+        {% include "_mcp_picker.html" %}
+      </div>
+      <div style="grid-column:1/-1">
+        {% with defaults=DEFAULT_ALLOWED_TOOLS %}
+          {% include "_allowed_tools_picker.html" %}
+        {% endwith %}
+      </div>
+
+      <details class="adv-block" style="grid-column:1/-1">
+        <summary><strong>Advanced settings</strong> <span class="muted small">model, cost, timeout, retries, autopilot, notify, env</span></summary>
+        <div class="adv-grid">
+          <label>Max turns (hard cap)
+            <input name="max_turns" type="number" min="1" placeholder="e.g. 20">
+          </label>
+          <label>Max cost per run ($)
+            <input name="max_cost_usd" type="number" step="0.01" min="0" placeholder="e.g. 0.50">
+          </label>
+          <label>Timeout (seconds)
+            <input name="timeout_seconds" type="number" min="10" placeholder="e.g. 300">
+          </label>
+          <label>Retry count on failure
+            <input name="retry_count" type="number" min="0" placeholder="0 = never retry">
+          </label>
+          <label>Retry delay (seconds)
+            <input name="retry_delay_seconds" type="number" min="1" placeholder="60">
+          </label>
+          <label class="checkbox">
+            <input name="autopilot" type="checkbox" value="1">
+            <span>Autopilot: auto-approve outbound actions for this agent's runs</span>
+          </label>
+          <label class="checkbox">
+            <input name="notify_on_failure" type="checkbox" value="1">
+            <span>Notify on failure (queues a Slack draft)</span>
+          </label>
+          <label style="grid-column:1/-1">Notify target (Slack channel or @user)
+            <input name="notify_target" placeholder="#eng-alerts or @your-username">
+          </label>
+          <label style="grid-column:1/-1">Environment variables (one KEY=value per line)
+            <textarea name="env_vars" rows="3" placeholder="GITHUB_TOKEN=ghp_..."></textarea>
+          </label>
+        </div>
+      </details>
+
+      <div style="grid-column:1/-1"><button class="primary" type="submit">Create agent</button></div>
+    </form>
+  </div>
+</details>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>All agents ({{ agents|length }})</h2>
+  </div>
+  <div class="panel-body no-pad">
+    <table>
+      <thead>
+        <tr>
+          <th>Agent</th>
+          <th>Skill</th>
+          <th>Schedule</th>
+          <th>Next run (IST)</th>
+          <th>Repo</th>
+          <th>MCPs</th>
+          <th>Last run</th>
+          <th>Success</th>
+          <th>Cost</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in agents %}
+        <tr>
+          <td>
+            <a href="/agents/{{ a.id }}"><strong>{{ a.name }}</strong></a>
+            <div class="small">
+              {% if a.enabled %}<span class="badge on">on</span>
+              {% else %}<span class="badge off">paused</span>{% endif %}
+            </div>
+          </td>
+          <td>
+            <code>{{ a.skill_name }}</code> <span class="tag {{ a.skill_kind }}">{{ a.skill_kind }}</span>
+            {% if a.step_count and a.step_count > 1 %}
+              <div class="small muted">+ {{ a.step_count - 1 }} more step{% if a.step_count > 2 %}s{% endif %}</div>
+            {% endif %}
+          </td>
+          <td><code>{{ a.cron_expr }}</code></td>
+          <td>
+            {% if a.next_run_time %}
+              <div>{{ a.next_run_time | ist }}</div>
+              <div class="small muted">{{ a.next_run_time | rel }}</div>
+            {% elif not a.enabled %}
+              <span class="muted small">paused</span>
+            {% else %}
+              <span class="muted small">—</span>
+            {% endif %}
+          </td>
+          <td>{{ a.repo_name or '<span class="muted small">custom</span>' | safe }}</td>
+          <td>
+            {% if a.mcps_list %}
+              <div class="mcp-badges">
+                {% for n in a.mcps_list[:3] %}<span class="mcp-badge">{{ n }}</span>{% endfor %}
+                {% if a.mcps_list|length > 3 %}<span class="mcp-badge all">+{{ a.mcps_list|length - 3 }}</span>{% endif %}
+              </div>
+            {% else %}
+              <span class="mcp-badge all">all</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if a.last_run_at %}
+              <div class="small">{{ a.last_run_at | ist }}</div>
+              <div class="muted small">{{ a.last_run_at | rel }}</div>
+              <span class="badge {{ a.last_status }}">{{ a.last_status }}</span>
+            {% else %}
+              <span class="muted small">never</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if a.runs_total %}
+              {% set rate = (100 * a.runs_ok / a.runs_total) | round(0) | int %}
+              <span class="stat-line">
+                <span class="dot {{ 'ok' if rate >= 90 else ('err' if rate < 60 else '') }}"></span>
+                {{ rate }}% · {{ a.runs_ok }}/{{ a.runs_total }}
+              </span>
+            {% else %}
+              <span class="muted small">—</span>
+            {% endif %}
+          </td>
+          <td>${{ '%.4f' % (a.total_cost or 0) }}</td>
+          <td class="row-actions-inline">
+            <form action="/agents/{{ a.id }}/run-now" method="post" style="display:inline">
+              <button class="tiny" title="Run now">▸</button>
+            </form>
+            <form action="/agents/{{ a.id }}/toggle" method="post" style="display:inline">
+              <button class="tiny ghost" title="Toggle">{{ '⏸' if a.enabled else '▶' }}</button>
+            </form>
+            <form action="/agents/{{ a.id }}/delete" method="post" style="display:inline"
+                  onsubmit="return confirm('Delete agent \'{{ a.name }}\'?');">
+              <button class="tiny danger" title="Delete">×</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr class="empty-row">
+          <td colspan="10">
+            No agents yet. Click <strong>+ New agent</strong> to schedule your first one
+            (e.g. <code>pr-watcher</code> on <code>*/15 * * * *</code>).
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

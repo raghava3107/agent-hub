@@ -1,0 +1,29 @@
+<table>
+  <thead>
+    <tr><th>#</th><th>Skill</th><th>Model</th><th>Where</th><th>Status</th><th>Started</th><th>Cost</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for r in runs %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>
+        <code>{{ r.skill_name }}</code>
+        {% if r.schedule_id %}<div class="small muted">agent #{{ r.schedule_id }}</div>{% endif %}
+      </td>
+      <td>
+        {% if r.model %}<span class="badge queued">{{ r.model }}</span>{% else %}<span class="muted small">inherit</span>{% endif %}
+      </td>
+      <td class="small muted"><code>{{ r.working_directory }}</code></td>
+      <td><span class="badge {{ r.status }}">{{ r.status }}</span></td>
+      <td class="small">
+        {{ r.started_at | ist }}
+        {% if r.started_at %}<div class="muted small">{{ r.started_at | rel }}</div>{% endif %}
+      </td>
+      <td>{% if r.total_cost_usd %}${{ '%.4f' % r.total_cost_usd }}{% else %}<span class="muted">—</span>{% endif %}</td>
+      <td><a href="/runs/{{ r.id }}">open →</a></td>
+    </tr>
+    {% else %}
+    <tr class="empty-row"><td colspan="8">No runs match this filter.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

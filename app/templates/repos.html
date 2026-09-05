@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block page_title %}Repositories{% endblock %}
+{% block subtitle %}<div class="subtitle">Folders your agents can operate on</div>{% endblock %}
+{% block topbar_actions %}
+  <button class="btn primary" onclick="document.getElementById('new-repo').open=true">
+    {% include "_icons/plus.html" %} Register repo
+  </button>
+{% endblock %}
+
+{% block body %}
+
+<details class="panel" id="new-repo" style="margin-bottom:20px">
+  <summary style="padding:14px 18px; background:var(--panel-2); border-bottom:1px solid var(--border);">
+    <strong>+ Register a new repo</strong>
+    <span class="muted small">Any folder on your machine — HomeCloud, another project, whatever</span>
+  </summary>
+  <div class="panel-body">
+    <form action="/repos" method="post" style="display:grid; gap:12px; grid-template-columns:1fr 2fr auto">
+      <label>Name<input name="name" required placeholder="e.g. HomeCloud"></label>
+      <label>Absolute path<input name="path" required placeholder="/path/to/your/repo"></label>
+      <div style="display:flex; align-items:flex-end"><button class="primary" type="submit">Add</button></div>
+    </form>
+  </div>
+</details>
+
+<div class="panel">
+  <div class="panel-body no-pad">
+    <table>
+      <thead><tr><th>Name</th><th>Path</th><th>Agents</th><th>Runs</th><th>Registered</th><th></th></tr></thead>
+      <tbody>
+        {% for r in repos %}
+        <tr>
+          <td><strong>{{ r.name }}</strong></td>
+          <td><code>{{ r.path }}</code></td>
+          <td>{{ r.agents_total or 0 }}</td>
+          <td>{{ r.runs_total or 0 }}</td>
+          <td class="small muted">{{ r.created_at }}</td>
+          <td>
+            <form action="/repos/{{ r.id }}/delete" method="post" style="display:inline"
+                  onsubmit="return confirm('Remove {{ r.name }}? Existing runs are kept.');">
+              <button class="tiny danger">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr class="empty-row"><td colspan="6">No repos yet. Register one above.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

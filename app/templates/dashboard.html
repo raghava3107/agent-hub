@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block page_title %}Dashboard{% endblock %}
+{% block subtitle %}<div class="subtitle">Overview of your agents, runs, and approvals</div>{% endblock %}
+{% block topbar_actions %}
+  <a href="/skills" class="btn">{% include "_icons/plus.html" %} New run</a>
+  <a href="/agents" class="btn primary">{% include "_icons/plus.html" %} New agent</a>
+{% endblock %}
+
+{% block body %}
+
+<div hx-get="/partials/dashboard-kpis" hx-trigger="every 3s" hx-swap="innerHTML">
+  {% include "_dashboard_kpis.html" %}
+</div>
+
+<div class="panel" style="margin-bottom:16px">
+  <div class="panel-head">
+    <h2>Upcoming runs</h2>
+    <span class="muted small">last fired + next scheduled · {{ DISPLAY_TZ_NAME }} · live</span>
+  </div>
+  <div class="panel-body no-pad"
+       hx-get="/partials/dashboard-upcoming"
+       hx-trigger="every 5s"
+       hx-swap="innerHTML">
+    {% include "_upcoming.html" %}
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Top agents</h2>
+      <a href="/agents" class="btn ghost tiny">View all →</a>
+    </div>
+    <div class="panel-body no-pad">
+      <table>
+        <thead>
+          <tr><th>Agent</th><th>Skill</th><th>Runs</th><th>Success</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for a in agents %}
+          <tr>
+            <td>
+              <a href="/agents/{{ a.id }}"><strong>{{ a.name }}</strong></a>
+              <div class="small muted">every <code>{{ a.cron_expr }}</code>
+                {% if not a.enabled %}· <span class="badge off">paused</span>{% endif %}
+              </div>
+            </td>
+            <td><code>{{ a.skill_name }}</code></td>
+            <td>{{ a.runs_total or 0 }}</td>
+            <td>
+              {% if a.runs_total %}
+                {% set rate = (100 * a.runs_ok / a.runs_total) | round(0) | int %}
+                <span class="stat-line">
+                  <span class="dot {{ 'ok' if rate >= 90 else ('err' if rate < 60 else '') }}"></span>
+                  {{ rate }}%
+                </span>
+              {% else %}
+                <span class="muted small">—</span>
+              {% endif %}
+            </td>
+            <td class="row-actions-inline">
+              <form action="/agents/{{ a.id }}/run-now" method="post" style="display:inline">
+                <button class="tiny" title="Run now">▸</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr class="empty-row"><td colspan="5">No agents yet. <a href="/agents">Create your first agent →</a></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Recent activity</h2>
+      <a href="/runs" class="btn ghost tiny">View all →</a>
+    </div>
+    <div class="panel-body no-pad" hx-get="/partials/dashboard-activity" hx-trigger="every 3s" hx-swap="innerHTML">
+      {% include "_activity.html" %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

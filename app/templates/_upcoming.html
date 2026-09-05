@@ -1,0 +1,29 @@
+{% if upcoming %}
+<table>
+  <thead>
+    <tr><th>Agent</th><th>Cron</th><th>Last fired</th><th>Next run ({{ DISPLAY_TZ_NAME }})</th><th>Countdown</th></tr>
+  </thead>
+  <tbody>
+    {% for u in upcoming %}
+    <tr>
+      <td><a href="/agents/{{ u.schedule_id }}"><strong>{{ u.name }}</strong></a></td>
+      <td><code>{{ u.cron_expr }}</code></td>
+      <td>
+        {% if u.last_fired_at %}
+          <div class="small">{{ u.last_fired_at | ist }}</div>
+          <div class="muted small">{{ u.last_fired_at | rel }}</div>
+        {% else %}
+          <span class="muted small">never</span>
+        {% endif %}
+      </td>
+      <td>{{ u.next_run_time | ist }}</td>
+      <td><span class="muted">{{ u.next_run_time | rel }}</span></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="panel-body center muted small" style="padding:20px">
+  No scheduled agents queued. <a href="/agents">Create one</a>.
+</div>
+{% endif %}

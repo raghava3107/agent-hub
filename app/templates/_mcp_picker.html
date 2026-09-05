@@ -1,0 +1,35 @@
+{# args: mcps (list of Mcp), picked (set of names) or nothing, name_attr (default 'mcps') #}
+{% set _picked = picked_mcps if picked_mcps is defined else [] %}
+{% set _name = name_attr if name_attr is defined else 'mcps' %}
+<div class="mcp-picker">
+  <div class="mcp-picker-head">
+    <span class="muted small">MCP servers — pick which tools this agent may use</span>
+    {% if mcps %}
+    <label class="mcp-all">
+      <input type="checkbox"
+             onchange="const b=this.checked; this.closest('.mcp-picker').querySelectorAll('input[name={{ _name }}]').forEach(x=>x.checked=b);">
+      All / none
+    </label>
+    {% endif %}
+  </div>
+  {% if mcps %}
+  <div class="mcp-grid">
+    {% for m in mcps %}
+    <label class="mcp-chip">
+      <input type="checkbox" name="{{ _name }}" value="{{ m.name }}"
+             {% if m.name in _picked %}checked{% endif %}>
+      <span class="mcp-chip-body">
+        <span class="mcp-name">{{ m.name }}</span>
+        <span class="mcp-kind tag {{ m.kind }}">{{ m.kind }}</span>
+      </span>
+      <span class="mcp-source muted small">{{ m.source }}</span>
+    </label>
+    {% endfor %}
+  </div>
+  <div class="muted small" style="margin-top:4px">
+    Leave all unchecked to inherit whatever your <code>~/.claude</code> config provides (all MCPs).
+  </div>
+  {% else %}
+  <div class="muted small">No MCPs discovered in <code>~/.claude.json</code> or <code>~/.claude/settings.json</code>.</div>
+  {% endif %}
+</div>

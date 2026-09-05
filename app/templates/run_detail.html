@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block page_title %}Run #{{ run.id }}{% endblock %}
+{% block subtitle %}<div class="subtitle"><code>{{ run.skill_name }}</code> · {{ run.working_directory }}</div>{% endblock %}
+
+{% block topbar_actions %}
+  {% if run.status in ['queued', 'running'] %}
+  <form action="/runs/{{ run.id }}/kill" method="post"
+        onsubmit="return confirm('Kill this run? The process group will be terminated (SIGTERM → SIGKILL after 3s).');">
+    <button class="btn danger">⛔ Kill run</button>
+  </form>
+  {% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="crumbs"><a href="/runs">← Runs</a></div>
+
+<div class="panel" style="margin-bottom:16px">
+  <div class="panel-body">
+    <div class="pill-row" style="margin-bottom:10px">
+      <span class="badge {{ run.status }}">{{ run.status }}</span>
+      {% if run.exit_code is not none %}<span class="muted small">exit={{ run.exit_code }}</span>{% endif %}
+      {% if run.total_cost_usd %}<span class="muted small">· cost ${{ '%.4f' % run.total_cost_usd }}</span>{% endif %}
+      <span class="muted small">· started {{ run.started_at | ist }} ({{ run.started_at | rel }})</span>
+      {% if run.finished_at %}<span class="muted small">· finished {{ run.finished_at | ist }}</span>{% endif %}
+      {% if run.schedule_id %}<span class="muted small">· from agent <a href="/agents/{{ run.schedule_id }}">#{{ run.schedule_id }}</a></span>{% endif %}
+    </div>
+    {% if run.allowed_mcps %}
+    <div class="mcp-badges" style="margin-bottom:8px">
+      <span class="muted small">MCPs:</span>
+      {% for n in run.allowed_mcps|fromjson %}<span class="mcp-badge">{{ n }}</span>{% endfor %}
+    </div>
+    {% endif %}
+    {% if run.allowed_tools %}
+    <div class="mcp-badges" style="margin-bottom:8px">
+      <span class="muted small">Allowed tools:</span>
+      {% for pat in run.allowed_tools|fromjson %}
+        <span class="tool-badge {% if pat in DEFAULT_ALLOWED_TOOLS %}default{% else %}extra{% endif %}">{{ pat }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <details>
+      <summary class="muted small">Prompt (click to expand)</summary>
+      <pre class="prompt-box" style="margin-top:8px">{{ run.prompt }}</pre>
+    </details>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-head">
+    <h2>Log</h2>
+    {% if run.status in ['queued', 'running'] %}
+      <span class="badge running">live</span>
+    {% endif %}
+  </div>
+  <div class="panel-body" id="log-panel"
+       {% if run.status in ['queued', 'running'] %}
+         hx-get="/partials/run/{{ run.id }}/logs" hx-trigger="every 2s" hx-swap="innerHTML"
+       {% endif %}>
+    {% include "_run_log.html" %}
+  </div>
+</div>
+
+<script>
+// Log auto-tail: keep the newest lines visible during live polling.
+// - Initial load: scroll to bottom so latest is on screen immediately.
+// - After each HTMX swap: if user was at the bottom, follow the tail.
+// - If user manually scrolls up to read something: leave them alone.
+(function () {
+  var followTail = true;
+
+  function findLog() { return document.querySelector('#log-panel .log'); }
+  function nearBottom(el) {
+    return (el.scrollHeight - el.scrollTop - el.clientHeight) < 40;
+  }
+  function jumpToBottom() {
+    var el = findLog();
+    if (el) el.scrollTop = el.scrollHeight;
+  }
+
+  // Track "was the user at the bottom?" BEFORE the swap destroys the log element.
+  document.body.addEventListener('htmx:beforeSwap', function (e) {
+    if (e.target.id !== 'log-panel') return;
+    var el = e.target.querySelector('.log');
+    if (el) followTail = nearBottom(el);
+  });
+
+  // After the swap: if they were following the tail, snap to the new bottom.
+  document.body.addEventListener('htmx:afterSwap', function (e) {
+    if (e.target.id !== 'log-panel') return;
+    if (followTail) jumpToBottom();
+  });
+
+  // On initial load, always start at the bottom.
+  document.addEventListener('DOMContentLoaded', function () {
+    jumpToBottom();
+    followTail = true;
+  });
+})();
+</script>
+
+{% endblock %}

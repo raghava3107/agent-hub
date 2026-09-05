@@ -1,0 +1,24 @@
+{% if activity %}
+<ul class="activity">
+  {% for r in activity %}
+  <li>
+    <span class="dot {{ r.status }}"></span>
+    <div class="body">
+      <div class="title">
+        <a href="/runs/{{ r.id }}"><code>{{ r.skill_name }}</code></a>
+        <span class="badge {{ r.status }}" style="margin-left:6px">{{ r.status }}</span>
+      </div>
+      <div class="meta">
+        {{ r.started_at | ist }} · <span class="muted">{{ r.started_at | rel }}</span>
+        {% if r.working_directory %} · <span class="mono">{{ r.working_directory.split('/')[-1] }}</span>{% endif %}
+        {% if r.total_cost_usd %} · ${{ '%.4f' % r.total_cost_usd }}{% endif %}
+      </div>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="panel-body">
+  <p class="muted center small" style="padding:24px">No activity yet. Run any skill to get started.</p>
+</div>
+{% endif %}

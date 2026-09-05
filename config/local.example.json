@@ -1,0 +1,10 @@
+{
+  "agent_hub": {
+    "plist_label_prefix": "com.yourname.agent-hub",
+    "hostname": "localhost",
+    "port": 8765
+  },
+  "skills": {
+    "managed_repo": "/Users/yourname/WorkSpace/my-agents"
+  }
+}

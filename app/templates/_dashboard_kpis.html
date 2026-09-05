@@ -1,0 +1,34 @@
+<div class="kpis">
+  <div class="kpi">
+    <div class="kpi-head">
+      <span class="kpi-label">Skills</span>
+      <span class="kpi-icon">{% include "_icons/skills.html" %}</span>
+    </div>
+    <div class="kpi-value">{{ counts.skills }}</div>
+    <div class="kpi-sub">Available to run</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-head">
+      <span class="kpi-label">Agents</span>
+      <span class="kpi-icon info">{% include "_icons/agent.html" %}</span>
+    </div>
+    <div class="kpi-value">{{ counts.active_agents }}</div>
+    <div class="kpi-sub">{{ counts.total_agents }} total · {{ counts.active_agents }} active</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-head">
+      <span class="kpi-label">Running now</span>
+      <span class="kpi-icon ok">{% include "_icons/runs.html" %}</span>
+    </div>
+    <div class="kpi-value">{{ counts.running }}</div>
+    <div class="kpi-sub">{{ counts.completed_today }} completed, {{ counts.failed_today }} failed today</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-head">
+      <span class="kpi-label">Approvals</span>
+      <span class="kpi-icon warn">{% include "_icons/check.html" %}</span>
+    </div>
+    <div class="kpi-value">{{ counts.pending_approvals }}</div>
+    <div class="kpi-sub">${{ '%.4f' % counts.cost_today }} spent today</div>
+  </div>
+</div>

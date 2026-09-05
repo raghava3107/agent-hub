@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block page_title %}Skills{% endblock %}
+{% block subtitle %}<div class="subtitle">{{ skills|length }} of {{ nav.skills }} · discovered from ~/.claude and this repo</div>{% endblock %}
+
+{% block body %}
+
+{% if sync.available %}
+<div class="panel" style="margin-bottom:16px">
+  <div class="panel-body" style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:260px">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <strong>Skill sync</strong>
+        {% if sync.state == 'linked' %}
+          <span class="badge on">✓ fully linked</span>
+        {% elif sync.state == 'per-file' %}
+          <span class="badge on">per-file symlinked</span>
+        {% elif sync.state == 'in_sync' %}
+          <span class="badge on">in sync</span>
+        {% elif sync.state == 'drift' %}
+          <span class="badge failed">drift detected</span>
+        {% else %}
+          <span class="badge queued">unknown</span>
+        {% endif %}
+        {% if sync.daemon == 'loaded' %}
+          <span class="badge on">auto-sync on</span>
+        {% else %}
+          <span class="badge off">auto-sync off</span>
+        {% endif %}
+      </div>
+      <div class="muted small" style="margin-top:4px">
+        Keeps <code>~/.claude/skills</code>, <code>~/.claude/commands</code>, and this repo's <code>claude/</code> in one place.
+      </div>
+    </div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+      <form action="/sync/skills" method="post" style="display:inline">
+        <input type="hidden" name="action" value="sync">
+        <button class="btn">Sync now</button>
+      </form>
+      {% if sync.state != 'linked' %}
+      <form action="/sync/skills" method="post" style="display:inline"
+            onsubmit="return confirm('This will symlink ~/.claude/skills and ~/.claude/commands to the repo. Existing home dirs get backed up as .bak. Continue?');">
+        <input type="hidden" name="action" value="link">
+        <button class="btn primary">Link home → repo</button>
+      </form>
+      {% endif %}
+      {% if sync.daemon != 'loaded' %}
+      <form action="/sync/skills" method="post" style="display:inline">
+        <input type="hidden" name="action" value="install-daemon">
+        <button class="btn">Install auto-sync</button>
+      </form>
+      {% else %}
+      <form action="/sync/skills" method="post" style="display:inline">
+        <input type="hidden" name="action" value="uninstall-daemon">
+        <button class="btn ghost">Stop auto-sync</button>
+      </form>
+      {% endif %}
+    </div>
+    <details style="width:100%; margin-top:4px">
+      <summary class="muted small">Details</summary>
+      <pre class="prompt-box" style="margin-top:8px; font-size:11.5px;">{{ sync.raw }}</pre>
+    </details>
+  </div>
+</div>
+{% endif %}
+
+<form method="get" class="toolbar" id="skills-toolbar">
+  <div class="search-input">
+    <span class="ico">{% include "_icons/search.html" %}</span>
+    <input name="q" value="{{ q }}" placeholder="Search skills by name or description…" autofocus>
+  </div>
+  <div class="filter-chips">
+    <a class="btn {% if not active_kind %}on{% endif %}" href="/skills{% if q %}?q={{ q }}{% endif %}">All</a>
+    {% for k in kinds %}
+      <a class="btn {% if active_kind == k %}on{% endif %}"
+         href="/skills?kind={{ k }}{% if q %}&q={{ q }}{% endif %}">{{ k }}</a>
+    {% endfor %}
+  </div>
+</form>
+
+<div class="skills-grid">
+  {% for s in skills %}
+  <div class="skill-card">
+    <div class="skill-head">
+      <span class="skill-name">{{ s.name }}</span>
+      <span class="tag {{ s.kind }}">{{ s.kind }}</span>
+    </div>
+    <div class="skill-desc">{{ s.description or 'No description.' }}</div>
+    <div class="skill-foot">
+      <span class="path" title="{{ s.path }}">{{ s.path.split('/')[-1] }}</span>
+      <details style="margin:0">
+        <summary><span class="btn primary tiny">{% include "_icons/play.html" %} Run</span></summary>
+        <form action="/run" method="post" style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:grid; gap:8px;">
+          <input type="hidden" name="skill_name" value="{{ s.name }}">
+          <input type="hidden" name="skill_kind" value="{{ s.kind }}">
+          <label>Repo
+            <select name="repo_id">
+              <option value="">— or path below —</option>
+              {% for r in repos %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}
+            </select>
+          </label>
+          <label>Working directory
+            <input name="working_directory" placeholder="/absolute/path">
+          </label>
+          <label>Prompt / goal
+            <textarea name="prompt" rows="2" placeholder="What should this skill do?"></textarea>
+          </label>
+          <label>Permission mode
+            <select name="permission_mode">
+              <option value="plan">plan (read-only)</option>
+              <option value="acceptEdits" selected>acceptEdits (default)</option>
+              <option value="bypassPermissions">bypassPermissions</option>
+              <option value="default">default</option>
+            </select>
+          </label>
+          <details>
+            <summary class="muted small">MCP servers (optional — leave collapsed to inherit all)</summary>
+            <div style="margin-top:8px">{% include "_mcp_picker.html" %}</div>
+          </details>
+          <details>
+            <summary class="muted small">Allowed tool patterns (git + gh always on; add extras here)</summary>
+            <div style="margin-top:8px">
+              {% with defaults=DEFAULT_ALLOWED_TOOLS %}
+                {% include "_allowed_tools_picker.html" %}
+              {% endwith %}
+            </div>
+          </details>
+          <button class="primary" type="submit">Run now</button>
+        </form>
+      </details>
+    </div>
+  </div>
+  {% else %}
+  <div class="panel"><div class="panel-body center muted">No skills match your filter.</div></div>
+  {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block page_title %}Approval #{{ approval.id }}{% endblock %}
+{% block subtitle %}<div class="subtitle"><span class="tag {{ approval.kind }}">{{ approval.kind }}</span> → <code>{{ approval.target }}</code></div>{% endblock %}
+
+{% block body %}
+<div class="crumbs"><a href="/approvals">← Approvals</a></div>
+
+<div class="panel" style="margin-bottom:16px">
+  <div class="panel-body">
+    <div class="pill-row" style="margin-bottom:12px">
+      <span class="badge {{ approval.status }}">{{ approval.status }}</span>
+      {% if approval.run_id %}<span class="muted small">from run <a href="/runs/{{ approval.run_id }}">#{{ approval.run_id }}</a></span>{% endif %}
+      <span class="muted small">created {{ approval.created_at }}</span>
+      {% if approval.resolved_at %}<span class="muted small">· resolved {{ approval.resolved_at }}</span>{% endif %}
+    </div>
+
+    <h3 style="margin-bottom:8px">Payload</h3>
+    <pre class="prompt-box">{{ approval.payload }}</pre>
+
+    {% if approval.status == 'pending' %}
+    <div style="margin-top:16px; display:flex; gap:8px">
+      <form action="/approvals/{{ approval.id }}/approve" method="post">
+        <button class="btn primary">Approve & send</button>
+      </form>
+      <form action="/approvals/{{ approval.id }}/reject" method="post">
+        <button class="btn">Reject</button>
+      </form>
+    </div>
+    <p class="muted small" style="margin-top:12px">
+      v1 uses dry-run — approving records intent but does not actually POST to the target.
+      Wire the real sender in <code>app/approvals.py::_dispatch</code> when you have credentials.
+    </p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

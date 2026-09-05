@@ -1,0 +1,7 @@
+{% if logs %}
+<pre class="log">{% for l in logs %}<span class="s-{{ l.stream }}">{{ l.ts }} [{{ l.stream }}] {{ l.line }}</span>
+{% endfor %}</pre>
+{% else %}
+<p class="muted small center" style="padding:24px">Waiting for output…</p>
+{% endif %}
+{% if run.error %}<div class="error-box"><strong>Error:</strong><pre>{{ run.error }}</pre></div>{% endif %}
