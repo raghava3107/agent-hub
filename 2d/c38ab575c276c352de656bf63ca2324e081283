@@ -1,0 +1,21 @@
+docs/screenshots/agents-demo.svg
+  s_826bb030b03dda::t_07d0077cd31bdf 1-19
+README.md
+  s_826bb030b03dda::t_07d0077cd31bdf 114-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "2dc38ab575c276c352de656bf63ca2324e081283",
+  "prompts": {},
+  "sessions": {
+    "s_826bb030b03dda": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a072b3-d27d-7b41-beec-2a0a845fb075",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Raghavendra Reddy <rkota@g2.com>"
+    }
+  }
+}
